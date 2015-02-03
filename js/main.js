@@ -1,23 +1,23 @@
 window.onload = function() {
 
 		// Creates a new Phaser game on the canvas named test. The {} parameter holds all the functions for the game
-    var game = new Phaser.Game(800, 600, Phaser.CANVAS, 'Test', { preload: preload, create: create, update: update, render: render });
+    var game = new Phaser.Game(800, 600, Phaser.CANVAS, 'Game Name Here', { preload: preload, create: create, update: update, render: render });
 
     /*
     *	The preload function will run before all code. This is where loading assets should occur
     */
     function preload () {
     	// Load the spritesheet for our player, indicating the location, size of sprites, and the number of images on the sheet
-			game.load.spritesheet('player', 'bmario.png', 32, 32, 18);
+			game.load.spritesheet('player', 'images/bmario.png', 32, 32, 18);
 
 			// Loads the tilemap data from the JSON exported from tiled.
-			game.load.tilemap('tilemap', 'tilemap.json', null, Phaser.Tilemap.TILED_JSON);
+			game.load.tilemap('tilemap', 'json/tilemap.json', null, Phaser.Tilemap.TILED_JSON);
 			
 			// Loads the actual tiles for the tilemap
-			game.load.image('tiles', 'tiles.bmp');
+			game.load.image('tiles', 'images/tiles.bmp');
 
 			// Loads the background image
-			game.load.image('background', 'sand.jpg');
+			game.load.image('background', 'images/sand.jpg');
     }
 
     var player;												// The Player of the game
