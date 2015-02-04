@@ -29,7 +29,9 @@ git pull origin master
 ```
 * You will be prompted for a username and password after you do the pull.
 * Now you should have the game files in the master directory.
-#### Demo
+
+Demo
+
 * The demo is the same as the master for the most part but with a few added things.
 * First clone the repo into a folder called demo like we did previously for master.
 ```sh
@@ -38,7 +40,7 @@ cd demo
 ```
 * Now we have to tell git that we want to track the demo branch in this folder.
 ```sh
-git --checkout origin demo
+git checkout origin demo
 git fetch origin demo
 git pull origin demo
 ```
