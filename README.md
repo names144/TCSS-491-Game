@@ -40,7 +40,7 @@ cd demo
 ```
 * Now we have to tell git that we want to track the demo branch in this folder.
 ```sh
-git checkout origin demo
+git checkout demo
 git fetch origin demo
 git pull origin demo
 ```
