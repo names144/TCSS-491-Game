@@ -101,7 +101,7 @@ window.onload = function() {
     var x = 0;
     var y = 0;
     for (var i = 0; i < 11; i++) {
-      game.add.tileSprite(x, y, 600, 800, 'clouds').autoScroll(-5, 0);
+      game.add.tileSprite(x, y, 600, 800, 'clouds');
       x += 600;
     }
 
