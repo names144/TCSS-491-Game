@@ -19,8 +19,6 @@ function Bullet() {
 
     bullet.animations.add('fire', [0,1,2,3], 5, true);
 
-    bullet.body.collideWorldBounds = true;
-
     bullet.body.allowGravity = false;
 
     bullet.animations.play('fire');

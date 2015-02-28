@@ -209,7 +209,7 @@ function MiniBoss() {
 
 	this.wasAttacked = false;
 
-
+	this.alive = true;
 	this.SPEED = 50;
 	this.health = 50;
 	this.damage = 10;
@@ -243,6 +243,7 @@ function MiniBoss() {
 
 		miniBoss.attributes.soundFX.hurt = game.add.audio('hit', 1, false);
 		miniBoss.attributes.soundFX.dead = game.add.audio('minibossDead', 1, false);
+		miniBoss.attributes.alive = true;
 	};
 
 	this.update = function(miniBoss, game, player) {
@@ -326,6 +327,7 @@ function MiniBoss() {
     	g.physics.enable(key, Phaser.Physics.ARCADE);
     	key.attributes.create(key, g, 'key');
     	g.items.push(key);
+    	miniBoss.attributes.alive = false;
     	miniBoss.kill();
 		}
 	}

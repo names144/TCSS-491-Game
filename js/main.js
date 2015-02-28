@@ -104,8 +104,6 @@ window.onload = function() {
       game.add.tileSprite(x, y, 600, 800, 'clouds').autoScroll(-5, 0);
       x += 600;
     }
-    
-
 
     // Add the tilemap created with tiled to the map
     map = game.add.tilemap('tilemap');
@@ -213,11 +211,11 @@ window.onload = function() {
       // we won
       var text = "You Got The Key! You Win!";
       var style = { font: "40px Arial", fill: "#ff0044", align: "center" };
-      gameEnd = true;
       player.body = null;
       var t = game.add.text(game.camera.x + 50, game.camera.y + 150, text, style);
       bgMusic.stop();
       winMusic.play();
+      gameEnd = true;
     }
   };
 
@@ -225,11 +223,12 @@ window.onload = function() {
     if (!player.attributes.alive) {
       bgMusic.stop();
       deadMusic.play();
-      gameEnd = true;
+      
       player.body = null;
       var text = "GAME OVER";
       var style = { font: "65px Arial", fill: "#ff0044", align: "center" };
       var t = game.add.text(game.camera.x + 100, game.camera.y + 150, text, style);
+      gameEnd = true;
     }
   }
 
@@ -244,7 +243,12 @@ window.onload = function() {
     if (miniBoss1.attributes.wasAttacked) {
       miniBoss1Health.crop(new Phaser.Rectangle(0, 0, w, miniBoss1Health.height));
       miniBoss1Health.updateCrop();
-      miniBoss1.attributes.wasAttacked = false;    
+      miniBoss1.attributes.wasAttacked = false;
+      if (!miniBoss1.attributes.alive) {
+        miniBoss1Health.kill();
+        healthTextBoss.destroy();
+        showBossHealth = false;
+      }
     }
   };
 
@@ -299,10 +303,12 @@ window.onload = function() {
 
     // Update mini boss 1 healthbar
     if (player.body.x >= 4752) {
-      healthTextBoss = game.add.text(10, 36, "BOSS: ", { font: "20px Arial", fill: "#003FB9", align: "center" });
-      healthTextBoss.fixedToCamera = true;
-      showBossHealth = true;
-      miniBoss1Health.visible = true;
+      if (!healthTextBoss) {
+        healthTextBoss = game.add.text(10, 36, "BOSS: ", { font: "20px Arial", fill: "#003FB9", align: "center" });
+        healthTextBoss.fixedToCamera = true;
+        showBossHealth = true;
+        miniBoss1Health.visible = true;
+      }
     }
 
     if (showBossHealth) {
