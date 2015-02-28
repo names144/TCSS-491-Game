@@ -41,7 +41,7 @@ window.onload = function() {
 
     // Load the healthbar
     game.load.image('healthBar', 'images/healthbar.png');
-    game.load.image('healthBarBoss', 'images/healthBarBoss.png');
+    game.load.image('healthBarBoss', 'images/healthbarBoss.png');
 
     // The bg music
     game.load.audio('bgMusic', ['sounds/hub_city_1.mp3']);
