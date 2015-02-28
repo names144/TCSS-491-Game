@@ -225,7 +225,6 @@ function Player() {
 
 	// Handling collisions from enemies
 	this.collide = function(player, obj) {
-
 		if (obj.attributes instanceof EvilGroundBunny) {
 			if (player.attributes.isAttacking) {
 				player.attributes.canBounce = false;
@@ -238,7 +237,7 @@ function Player() {
 			player.attributes.canBounce = true;
 		}
 
-		if (!(obj.attributes instanceof MiniBoss) && player.game.physics.arcade.distanceBetween(player, obj) < 30) {
+		if ((obj.attributes instanceof EvilGroundBunny) && player.game.physics.arcade.distanceBetween(player, obj) < 30) {
 			player.attributes.hurt(obj.attributes.damage);
 		} else {
 			player.attributes.hurt(obj.attributes.damage);
@@ -290,6 +289,8 @@ function Player() {
 				this.gainedHealth = true;
 			}
 		} else {
+			//console.log(this.items);
+			//console.log(item);
 			this.items.push(item.attributes.name);
 		}
 		item.kill();

@@ -184,6 +184,74 @@ function EvilGroundBunny() {
 			}			
 			enemy.kill();
 		}
+	}
+};
+
+
+
+function Bat() {
+
+	this.health = 10;
+	this.damage = 5;
+	this.direction = 'left';
+	this.soundFX = {hurt:null, dead:null};
+	
+	// Methods
+	this.create = function(enemy, game) {
+		// Sets the anchor for the sprite. Easier to handle axis flips, etc.
+	  enemy.anchor.setTo(0.5,0.5);
+
+	   // Sets the size of the enemy physics body.
+		enemy.body.setSize(32, 32, 0, 0);
+
+		enemy.body.allowGravity = false;
+
+		enemy.body.bounce = 0;
+
+		// The enemy should collide with the bounds of the world
+	  enemy.body.collideWorldBounds = true;
+	    
+	  // Animations are built from spritesheet, numbers in the array indicate the index of the image on the sheet
+	  enemy.animations.add('fly', [12,13,14], 15, true);
+
+		var rand = Math.floor((Math.random() * 3) + 1);
+
+		if (rand === 1) {
+			enemy.attributes.direction = 'left';
+		} else if (rand === 2) {
+			enemy.attributes.direction = 'right';
+			enemy.scale.x *= -1;
+		}
+
+		enemy.attributes.soundFX.hurt = game.add.audio('hit', 1, false);
+		enemy.attributes.soundFX.dead = game.add.audio('squish', 1, false);
+
+		// tween the bat
+		game.add.tween(enemy).to( { x: enemy.x + 500 }, 2000, Phaser.Easing.Linear.None, true, 0, -1, true);
+	};
+
+	this.hurt = function(enemy, damage) {
+
+		enemy.attributes.health -= damage;
+
+		enemy.attributes.soundFX.hurt.play();
+
+		if (enemy.attributes.health <= 0) {
+			// randomly drop an apple
+			var rand = Math.floor((Math.random() * 2) + 1);
+
+			if (rand === 2) {
+				enemy.attributes.soundFX.dead.play();
+				var g = enemy.game;
+				enemy.attributes.soundFX.dead.play();
+				var apple = g.add.sprite(enemy.position.x, enemy.position.y - 10, 'apple');
+	    	apple.attributes = new Item();
+	    	g.physics.enable(apple, Phaser.Physics.ARCADE);
+	    	apple.attributes.create(apple, g, 'apple');
+	    	g.items.push(apple);
+			}			
+			enemy.kill();
+		}
 		// Bounce the enemy back
 		if (enemy.attributes.touching !== undefined && enemy.attributes.touching.right) {
 			// Bounce right
@@ -194,6 +262,7 @@ function EvilGroundBunny() {
 			enemy.attributes.bounceTime = enemy.game.time.now;
 		}
 	}
+
 };
 
 
