@@ -25,18 +25,24 @@ function Player() {
 	this.bounceRight = false;	// If the player should bounce to the right on collision
 	this.bounceTop = false;		// If the player should bounce up on collision
 	this.bounceTime = 0;		// The time to bounce
+	this.canBounce = true;
 
 	this.health = 100;			// Players health
 	this.alive = true;			// True if the player is alive
 	this.wasAttacked = false;
 	this.isAttacking = false;
 	this.meleeDamage = 7;
+	this.gainedHealth = false;
 
 	this.lastShoot = 0;
 	this.bullets = [];
 	this.bulletDir = 'right';
 
 	this.items = [];
+
+	this.won = false;
+
+	this.soundFX = {sword:null,gun:null,jump:null};
 
 
 	// Methods of the player
@@ -63,13 +69,17 @@ function Player() {
 		player.animations.add('right', [3, 4, 5], 20, true);
 		player.animations.add('jump', [12, 14], 20, false);
 		player.animations.add('dead', [8], 20, false);
-		player.animations.add('melee', [13, 0], 15, false);
+		player.animations.add('melee', [18, 19], 15, false);
 
 		// Creates the keys for detecting key input
 		this.cursors = game.input.keyboard.createCursorKeys();
 		this.jumpButton = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
 		this.shootButton = game.input.keyboard.addKey(Phaser.Keyboard.X);
 		this.meleeButton = game.input.keyboard.addKey(Phaser.Keyboard.C);
+
+		this.soundFX.sword = game.add.audio('swordSound', 1, false);
+		this.soundFX.gun = game.add.audio('shoot', 1, false);
+		this.soundFX.jump = game.add.audio('jump', 0.75, false);
 	};
 
 	// Updates physics based on actions
@@ -77,28 +87,12 @@ function Player() {
 	// game = the Phaser game instance
 	this.update = function(player, game) {
 
-		if (player.attributes.items.length > 0) {
-			game.paused = true;
-			var text = "You Got The Key! You Win!";
-	    var style = { font: "40px Arial", fill: "#ff0044", align: "center" };
-
-	    var t = game.add.text(game.camera.x + 50, game.camera.y + 150, text, style);
-		}
-
-		if (!player.attributes.alive) {
-			game.paused = true;
-			var text = "GAME OVER";
-	    var style = { font: "65px Arial", fill: "#ff0044", align: "center" };
-
-	    var t = game.add.text(game.camera.x + 100, game.camera.y + 150, text, style);
-		}
-
 		// Idle speed is 0
-	  if (this.bounceLeft && (game.time.now - this.bounceTime) <= this.MAX_BOUNCE_TIME) {
+	  if (this.canBounce && this.bounceLeft && (game.time.now - this.bounceTime) <= this.MAX_BOUNCE_TIME) {
     	player.body.velocity.x = -this.BOUNCE_SPEED;
-    } else if (this.bounceRight && (game.time.now - this.bounceTime) <= this.MAX_BOUNCE_TIME) {
+    } else if (this.canBounce && this.bounceRight && (game.time.now - this.bounceTime) <= this.MAX_BOUNCE_TIME) {
     	player.body.velocity.x = this.BOUNCE_SPEED;
-    } else if (this.bounceUp && (game.time.now - this.bounceTime) <= this.MAX_BOUNCE_TIME) {
+    } else if (this.canBounce && this.bounceUp && (game.time.now - this.bounceTime) <= this.MAX_BOUNCE_TIME) {
     	player.body.velocity.y = -this.BOUNCE_SPEED;
     } else {
     	this.bounceTime = 0;
@@ -153,6 +147,7 @@ function Player() {
 		    player.animations.frame = 12;
 		    this.isJumping = true;
 		    this.facing = 'none';
+		    this.soundFX.jump.play();
 	    }
 
 	    // Movement for jumping
@@ -200,23 +195,56 @@ function Player() {
 			bullet.attributes.create(bullet, game, this.bulletDir);
 			this.bullets.push(bullet);
 			this.lastShoot = game.time.now;
+			this.soundFX.gun.play();
 		}
 
 		// Check for melee
 		if (this.meleeButton.isDown) {
 			player.animations.play('melee');
 			this.isAttacking = true;
-			player.body.setSize(48, 32, 0, 0);
+			this.soundFX.sword.play();
 		} else {
-			player.body.setSize(32, 32, 0, 0);
 			this.isAttacking = false;
+		}
+
+		if (player.attributes.items.length > 0) {
+			player.body.velocity.x = 0;
+	    player.body.velocity.y = 0;
+	    player.animations.stop();
+	    player.body.allowGravity = false;
+			this.won = true;			
+		}
+
+		if (!player.attributes.alive) {
+			player.body.velocity.x = 0;
+	    player.body.velocity.y = 0;
+	    player.animations.stop();
+	    player.body.allowGravity = false;
 		}
 	};
 
 	// Handling collisions from enemies
 	this.collide = function(player, obj) {
 
-		player.attributes.hurt(obj.attributes.damage);
+		if (obj.attributes instanceof EvilGroundBunny) {
+			if (player.attributes.isAttacking) {
+				player.attributes.canBounce = false;
+			} else {
+				player.attributes.canBounce = true;
+			}
+		} else if (obj.attributes instanceof MiniBoss) {
+			player.attributes.canBounce = true;
+		} else {
+			player.attributes.canBounce = true;
+		}
+
+		if (!(obj.attributes instanceof MiniBoss) && player.game.physics.arcade.distanceBetween(player, obj) < 30) {
+			player.attributes.hurt(obj.attributes.damage);
+		} else {
+			player.attributes.hurt(obj.attributes.damage);
+		}
+		
+		
 
 		if (player.attributes.isAttacking) {
 			obj.attributes.hurt(obj, player.attributes.meleeDamage);
@@ -253,6 +281,17 @@ function Player() {
 	};
 
 	this.addItem = function(item) {
-		this.items.push(item);
+		if (item.attributes.name === 'apple') {
+			if (this.health < 100) {
+				this.health += item.attributes.health;
+				if (this.health > 100) {
+					this.health = 100;
+				}
+				this.gainedHealth = true;
+			}
+		} else {
+			this.items.push(item.attributes.name);
+		}
+		item.kill();
 	};
 };

@@ -46,6 +46,7 @@ function Bullet() {
     bullet.kill();
 
     if (obj.attributes) {
+      obj.attributes.touching = bullet.body.touching;
       obj.attributes.hurt(obj, bullet.attributes.damage);
     }
   };

@@ -8,12 +8,19 @@ function EvilGroundBunny() {
 	
 	this.MAX_IDLE = 1000;
 	this.ATTACK_RANGE_X = 80;
+	this.BOUNCE_SPEED = 230;	// The bounce speed for collision with enemies
+	this.MAX_BOUNCE_TIME = 150;// Maximum time to bounce on collision in ms
 	this.ATTACK_RANGE_Y = 40;
 	this.JUMP_SPEED = 100;
 
+	this.bounceLeft = false;	// If the player should bounce to the left on collision
+	this.bounceRight = false;	// If the player should bounce to the right on collision
+	this.bounceTop = false;		// If the player should bounce up on collision
+	this.bounceTime = 0;		// The time to bounce
+
 	this.SPEED = 50;
 	this.health = 15;
-	this.damage = 5;
+	this.damage = 3;
 	this.direction = 'left';
 	this.loc = 0;
 	this.prevLoc = 0;
@@ -21,6 +28,8 @@ function EvilGroundBunny() {
 	this.isAttacking = false;
 	this.playerLocX = 0;
 	this.playerLocY = 0;
+
+	this.soundFX = {hurt:null, dead:null};
 
 
 
@@ -53,6 +62,9 @@ function EvilGroundBunny() {
 		} else {
 			enemy.attributes.idleTime = game.time.now + 1;
 		}
+
+		enemy.attributes.soundFX.hurt = game.add.audio('hit', 1, false);
+		enemy.attributes.soundFX.dead = game.add.audio('squish', 1, false);
 	};
 
 	this.update = function(enemy, game, player) {
@@ -61,94 +73,127 @@ function EvilGroundBunny() {
 		// Attack if player is near
 		var posX = player.position.x - enemy.position.x;
 		var posY = player.position.y - enemy.position.y;
-		if (Math.abs(posX) <= enemy.attributes.ATTACK_RANGE_X && Math.abs(posY) <= enemy.attributes.ATTACK_RANGE_Y && !enemy.attributes.isAttacking) {
-			// attack the player
-			enemy.animations.play('attack');
-			enemy.attributes.isAttacking = true;
-			enemy.attributes.playerLocX = posX;
-			enemy.attributes.playerLocY = posY;
 
-			if (enemy.attributes.playerLocX < 0) {
-				if (enemy.attributes.direction !== 'left') {
-					enemy.attributes.direction = 'left';
-					enemy.scale.x *= -1;
-				}
-			} else {
-				if (enemy.attributes.direction !== 'right') {
-					enemy.attributes.direction = 'right';
-					enemy.scale.x *= -1;
-				}
-			}
+		// bounce from attacks
+	  if (enemy.attributes.bounceLeft && (game.time.now - enemy.attributes.bounceTime) <= enemy.attributes.MAX_BOUNCE_TIME) {
+    	enemy.body.velocity.x = -enemy.attributes.BOUNCE_SPEED;
+    } else if (enemy.attributes.bounceRight && (game.time.now - enemy.attributes.bounceTime) <= enemy.attributes.MAX_BOUNCE_TIME) {
+    	enemy.body.velocity.x = enemy.attributes.BOUNCE_SPEED;
+    } else if (this.bounceUp && (game.time.now - enemy.attributes.bounceTime) <= enemy.attributes.MAX_BOUNCE_TIME) {
+    	enemy.body.velocity.y = -enemy.attributes.BOUNCE_SPEED;
+    } else {
+    	this.bounceTime = 0;
+    	this.bounceLeft = false;
+    	this.bounceRight = false;
+    	if (Math.abs(posX) <= enemy.attributes.ATTACK_RANGE_X && Math.abs(posY) <= enemy.attributes.ATTACK_RANGE_Y && !enemy.attributes.isAttacking) {
+				// attack the player
+				enemy.animations.play('attack');
+				enemy.attributes.isAttacking = true;
+				enemy.attributes.playerLocX = posX;
+				enemy.attributes.playerLocY = posY;
 
-			// jump at player
-			enemy.body.velocity.y = -enemy.attributes.JUMP_SPEED;
-
-		} else if (!enemy.attributes.isAttacking) {
-			if (Math.abs(enemy.attributes.prevLoc - enemy.position.x) >= 64) {
-				enemy.attributes.prevLoc = enemy.position.x;
-				enemy.body.velocity.x = 0;
-				
-
-				enemy.attributes.idleTime = game.time.now;
-
-			} else {
-
-				if (enemy.attributes.idleTime === 0) {
-					if (enemy.attributes.direction === 'left') {
-						enemy.body.velocity.x = -enemy.attributes.SPEED;
-					} else {
-						enemy.body.velocity.x = enemy.attributes.SPEED;
+				if (enemy.attributes.playerLocX < 0) {
+					if (enemy.attributes.direction !== 'left') {
+						enemy.attributes.direction = 'left';
+						enemy.scale.x *= -1;
 					}
 				} else {
-					if (game.time.now - enemy.attributes.idleTime > enemy.attributes.MAX_IDLE) {
-						enemy.attributes.idleTime = 0;
-						if (enemy.attributes.direction === 'left') {
-							// face right and move
-							enemy.scale.x *= -1;
-							enemy.attributes.direction = 'right';
-							enemy.animations.play('right');
-						} else {
-							// face left and move
-							enemy.scale.x *= -1;
-							enemy.attributes.direction = 'left';
-							enemy.animations.play('left');
-						}
-					} else {
-						enemy.animations.play('idle');
+					if (enemy.attributes.direction !== 'right') {
+						enemy.attributes.direction = 'right';
+						enemy.scale.x *= -1;
 					}
 				}
-			}
-		} else {
-			if (enemy.attributes.playerLocX > 0) {
-				enemy.body.velocity.x = 100;
-			} else {
-				enemy.body.velocity.x = -100;
-			}
 
-			if (enemy.body.onFloor()) {
+				// jump at player
 				enemy.body.velocity.y = -enemy.attributes.JUMP_SPEED;
+
+			} else if (!enemy.attributes.isAttacking) {
+				if (Math.abs(enemy.attributes.prevLoc - enemy.position.x) >= 64) {
+					enemy.attributes.prevLoc = enemy.position.x;
+					enemy.body.velocity.x = 0;
+					enemy.attributes.idleTime = game.time.now;
+
+				} else {
+
+					if (enemy.attributes.idleTime === 0) {
+						if (enemy.attributes.direction === 'left') {
+							enemy.body.velocity.x = -enemy.attributes.SPEED;
+						} else {
+							enemy.body.velocity.x = enemy.attributes.SPEED;
+						}
+					} else {
+						if (game.time.now - enemy.attributes.idleTime > enemy.attributes.MAX_IDLE) {
+							enemy.attributes.idleTime = 0;
+							if (enemy.attributes.direction === 'left') {
+								// face right and move
+								enemy.scale.x *= -1;
+								enemy.attributes.direction = 'right';
+								enemy.animations.play('right');
+							} else {
+								// face left and move
+								enemy.scale.x *= -1;
+								enemy.attributes.direction = 'left';
+								enemy.animations.play('left');
+							}
+						} else {
+							enemy.animations.play('idle');
+						}
+					}
+				}
+			} else {
+				if (enemy.attributes.playerLocX > 0) {
+					enemy.body.velocity.x = 100;
+				} else {
+					enemy.body.velocity.x = -100;
+				}
+
+				if (enemy.body.onFloor()) {
+					enemy.body.velocity.y = -enemy.attributes.JUMP_SPEED;
+				}
+
+				// if player out of bounds go back to normal
+				if (Math.abs(player.position.x - enemy.position.x) > enemy.attributes.ATTACK_RANGE_X) {
+					enemy.attributes.isAttacking = false;
+					enemy.animations.play('idle');
+					enemy.idleTime = game.time.now;
+				} 
 			}
 
-			// if player out of bounds go back to normal
-			if (Math.abs(player.position.x - enemy.position.x) > enemy.attributes.ATTACK_RANGE_X) {
-				enemy.attributes.isAttacking = false;
-				enemy.animations.play('idle');
-				enemy.idleTime = game.time.now;
-			} 
-		}
-
-		
+    }
 	};
 
 	this.hurt = function(enemy, damage) {
 
 		enemy.attributes.health -= damage;
 
+		enemy.attributes.soundFX.hurt.play();
+
 		if (enemy.attributes.health <= 0) {
+			// randomly drop an apple
+			var rand = Math.floor((Math.random() * 2) + 1);
+
+			if (rand === 2) {
+				enemy.attributes.soundFX.dead.play();
+				var g = enemy.game;
+				enemy.attributes.soundFX.dead.play();
+				var apple = g.add.sprite(enemy.position.x, enemy.position.y - 10, 'apple');
+	    	apple.attributes = new Item();
+	    	g.physics.enable(apple, Phaser.Physics.ARCADE);
+	    	apple.attributes.create(apple, g, 'apple');
+	    	g.items.push(apple);
+			}			
 			enemy.kill();
 		}
+		// Bounce the enemy back
+		if (enemy.attributes.touching !== undefined && enemy.attributes.touching.right) {
+			// Bounce right
+			enemy.attributes.bounceRight = true;
+			enemy.attributes.bounceTime = enemy.game.time.now;
+		} else if (enemy.attributes.touching !== undefined && enemy.attributes.touching.left) {
+			enemy.attributes.bounceLeft = true;
+			enemy.attributes.bounceTime = enemy.game.time.now;
+		}
 	}
-
 };
 
 
@@ -158,8 +203,12 @@ function EvilGroundBunny() {
 function MiniBoss() {
 
 	this.MAX_IDLE = 1000;
+	this.MAX_HEALTH = 50;
 	this.ATTACK_RANGE_X = 200;
 	this.ATTACK_RANGE_Y = 100;
+
+	this.wasAttacked = false;
+
 
 	this.SPEED = 50;
 	this.health = 50;
@@ -171,6 +220,8 @@ function MiniBoss() {
 	this.isAttacking = false;
 	this.playerLocX = 0;
 	this.playerLocY = 0;
+
+	this.soundFX = {hurt:null,dead:null};
 
 	this.create = function(miniBoss, game) {
 		// Sets the anchor for the sprite. Easier to handle axis flips, etc.
@@ -189,6 +240,9 @@ function MiniBoss() {
 		miniBoss.animations.add('die', [12,13,14,15], 5, false);
 
 		miniBoss.animations.play('idle');
+
+		miniBoss.attributes.soundFX.hurt = game.add.audio('hit', 1, false);
+		miniBoss.attributes.soundFX.dead = game.add.audio('minibossDead', 1, false);
 	};
 
 	this.update = function(miniBoss, game, player) {
@@ -261,10 +315,12 @@ function MiniBoss() {
 	};
 
 	this.hurt = function(miniBoss, damage) {
-
+		miniBoss.attributes.wasAttacked = true;
 		miniBoss.attributes.health -= damage;
+		miniBoss.attributes.soundFX.hurt.play();
 		if (miniBoss.attributes.health <= 0) {
 			var g = miniBoss.game;
+			miniBoss.attributes.soundFX.dead.play();
 			var key = g.add.sprite(miniBoss.position.x, miniBoss.position.y - 10, 'items');
     	key.attributes = new Item();
     	g.physics.enable(key, Phaser.Physics.ARCADE);
