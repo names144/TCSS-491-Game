@@ -386,8 +386,8 @@ window.onload = function() {
   *	The rendr function will show us the debug information at the top
   */
 	function render() {
-    game.debug.cameraInfo(game.camera, 32, 32);
-    game.debug.spriteCoords(player, 32, 300);
+    //game.debug.cameraInfo(game.camera, 32, 32);
+    //game.debug.spriteCoords(player, 32, 300);
 
 	}
 };
