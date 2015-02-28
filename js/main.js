@@ -18,6 +18,9 @@ window.onload = function() {
     // Load the bullet sprite sheet
     game.load.spritesheet('bullet', 'images/bullet_1.png', 32, 32, 4);
 
+    // Load the bat sprite
+    game.load.spritesheet('bat', 'images/bat.png', 32, 32, 24);
+
     // Load the apple
     game.load.spritesheet('apple', 'images/apple.png', 26, 26, 1);
 
@@ -55,7 +58,7 @@ window.onload = function() {
     game.load.audio('minibossDead', ['sounds/minibossDead.mp3']);
     game.load.audio('win', ['sounds/win.mp3']);
     game.load.audio('dead', ['sounds/end.mp3']);
-  }
+  };
 
   var gameEnd = false;
 
@@ -72,6 +75,11 @@ window.onload = function() {
   // Ground bunnies
 	var groundBunnies = [];
 	var groundBunnyLocations = [];
+
+  // Bats lvl 1
+  var bats1 = [];
+  var batsLoc1 = [];
+
 
   // Mini boss
   var miniBoss1;
@@ -101,7 +109,7 @@ window.onload = function() {
     var x = 0;
     var y = 0;
     for (var i = 0; i < 11; i++) {
-      game.add.tileSprite(x, y, 600, 800, 'clouds');
+      game.add.tileSprite(x, y, 600, 800, 'clouds').autoScroll(-5, 0);
       x += 600;
     }
 
@@ -138,12 +146,27 @@ window.onload = function() {
     groundBunnyLocations[8] = {x: 3960, y: 560};
     groundBunnyLocations[9] = {x: 5000, y: 752};
 
+    // Bat locations
+    batsLoc1[0] = {x: 64, y: 500};
+    batsLoc1[1] = {x: 1775, y: 310};
+    batsLoc1[2] = {x: 4400, y: 240};
+    batsLoc1[3] = {x: 5000, y: 400};
+    batsLoc1[4] = {x: 6200, y: 530};
+
     // Create the ground bunnies and position them
     for (var i = 0; i < 10; i++) {
     	groundBunnies[i] = game.add.sprite(groundBunnyLocations[i].x, groundBunnyLocations[i].y, 'evilGroundBunny');
     	game.physics.enable(groundBunnies[i], Phaser.Physics.ARCADE);
     	groundBunnies[i].attributes = new EvilGroundBunny();
     	groundBunnies[i].attributes.create(groundBunnies[i], game);
+    }
+
+    // Create bats and position
+    for (var i = 0; i < 5; i++) {
+      bats1[i] = game.add.sprite(batsLoc1[i].x, batsLoc1[i].y, 'bat');
+      game.physics.enable(bats1[i], Phaser.Physics.ARCADE);
+      bats1[i].attributes = new Bat();
+      bats1[i].attributes.create(bats1[i], game);
     }
     
     // Mini boss
@@ -203,19 +226,22 @@ window.onload = function() {
     miniBoss1Health.cropRect = new Phaser.Rectangle(0, 0, miniBoss1Health.width, miniBoss1Health.height);
     miniBoss1Health.startWidth = miniBoss1Health.width + 0;
     miniBoss1Health.visible = false;
-	}
+	};
 
+  function endGame() {
+    gameEnd = true;
+  };
 
   function checkForWin() {
     if (player.attributes.won) {
       // we won
+      bgMusic.stop();
+      winMusic.play();
       var text = "You Got The Key! You Win!";
       var style = { font: "40px Arial", fill: "#ff0044", align: "center" };
       player.body = null;
       var t = game.add.text(game.camera.x + 50, game.camera.y + 150, text, style);
-      bgMusic.stop();
-      winMusic.play();
-      gameEnd = true;
+      game.time.events.add(Phaser.Timer.SECOND, endGame, this);      
     }
   };
 
@@ -223,12 +249,11 @@ window.onload = function() {
     if (!player.attributes.alive) {
       bgMusic.stop();
       deadMusic.play();
-      
       player.body = null;
       var text = "GAME OVER";
       var style = { font: "65px Arial", fill: "#ff0044", align: "center" };
       var t = game.add.text(game.camera.x + 100, game.camera.y + 150, text, style);
-      gameEnd = true;
+      game.time.events.add(Phaser.Timer.SECOND, endGame, this);
     }
   }
 
@@ -274,6 +299,9 @@ window.onload = function() {
     // Collision with the players and the bunnies
     game.physics.arcade.collide(player, groundBunnies, player.attributes.collide);
 
+    // collision player and bats
+    game.physics.arcade.collide(player, bats1, player.attributes.collide);
+
     // Collision with the players and mini boss
     game.physics.arcade.collide(player, miniBoss1, player.attributes.collide);
 
@@ -282,6 +310,9 @@ window.onload = function() {
 
     // Set the collision for the bunnies and the world
     game.physics.arcade.collide(groundBunnies, layer);
+
+    // collision of bats
+    game.physics.arcade.collide(bats1, layer);
 
     // Updates for the player
     if (player.attributes.alive && !player.attributes.won) {
@@ -314,8 +345,6 @@ window.onload = function() {
     if (showBossHealth) {
       updateMiniBoss1Health();
     }
-    
-    
 
     // Updates for the bullets from player
     for (var i = 0; i < player.attributes.bullets.length; i++) {
@@ -327,6 +356,9 @@ window.onload = function() {
 
         // Collision bullets with bunnies
         game.physics.arcade.collide(player.attributes.bullets[i], groundBunnies, player.attributes.bullets[i].attributes.collide);
+
+        // collision bats1
+        game.physics.arcade.collide(player.attributes.bullets[i], bats1, player.attributes.bullets[i].attributes.collide);
 
         // Collision bullets with mini boss
         game.physics.arcade.collide(player.attributes.bullets[i], miniBoss1, player.attributes.bullets[i].attributes.collide);
@@ -354,8 +386,8 @@ window.onload = function() {
   *	The rendr function will show us the debug information at the top
   */
 	function render() {
-    //game.debug.cameraInfo(game.camera, 32, 32);
-    //game.debug.spriteCoords(player, 32, 300);
+    game.debug.cameraInfo(game.camera, 32, 32);
+    game.debug.spriteCoords(player, 32, 300);
 
 	}
 };
