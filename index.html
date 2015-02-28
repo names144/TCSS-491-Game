@@ -4,10 +4,12 @@
         <meta charset="UTF-8" />
         <title>Orange 3 Adventures!</title>
         <script src="js/phaser.min.js"></script>
+        <script src="js/npc.js"></script>
         <script src="js/item.js"></script>
         <script src="js/bullet.js"></script>
         <script src="js/player.js"></script>
         <script src="js/enemy.js"></script>
+        <script src="js/main.js"></script>
     </head>
 
     <style>
@@ -21,23 +23,54 @@
             border-width: 10px;
             border-color: #171717;
         }
-        h1 {
-            text-align: center;
-            color: #ffffff;
-        }
-        h2 {
-            color: #ffffff;
-            text-align: center;
-        }
         body {
+            text-align: center;
+            color: #ffffff;
+            font-size: 18px;
             background-image: url("images/bg.jpg"); 
         }
     </style>
-
+    
     <body>
         <h1>Orange 3 TCSS 491</h1>
         <h2>Nicholas Ames | Logan Feiler | Eric Miller</h2>
-        
-        <script type="text/javascript" src="js/main.js"></script>
+        <div id='gameWindow'></div>
+        <div id='directions'>
+            <p>
+            Your job is to guide our young hero into the dangerous world in order to help out the mysterious old man.
+            <br />
+            Listen to his words of wisdom and you may survive...
+            </p>
+            <br />
+            <div style="margin-left:33%;margin-right:auto;text-align:left;">
+                Attacks:
+                <ul>
+                    <li>Sword Slash:
+                        <ul>
+                            <li>A powerful attack with the sword given to you by the old man.</li>
+                        </ul>
+                    </li>
+                    <li>Laser Blast:
+                        <ul>
+                            <li>Shoot plasma bullets from your laser gun. But where do I get on of those...?</li>
+                        </ul>
+                    </li>
+                </ul>
+                Items:
+                <ul>
+                    <li>Keys:
+                        <ul>
+                            <li>Unlock doors. Duh.</li>
+                        </ul>
+                    </li>
+                    <li>Apples:
+                        <ul>
+                            <li>An apple a day keeps the doctor away...and you from dying...Pick these up from those evil little buns.</li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
     </body>
+    
 </html>
