@@ -121,7 +121,7 @@ window.onload = function() {
 		layer.resizeWorld();
 
 		// Create the player and position in the world with given name 48
-    player = game.add.sprite(6000, 752, 'player');
+    player = game.add.sprite(48, 752, 'player');
 
     player.attributes = new Player();
 
