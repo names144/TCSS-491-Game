@@ -31,21 +31,21 @@ function Bullet() {
   };
 
   this.update = function(bullet, game) {
-    if (bullet.attributes.direction === 'left') {
-      bullet.body.velocity.x = -bullet.attributes.SPEED;
-    } else {
-      bullet.body.velocity.x = bullet.attributes.SPEED;
+    if (bullet.alive) {
+      if (bullet.attributes.direction === 'left') {
+        bullet.body.velocity.x = -bullet.attributes.SPEED;
+      } else {
+        bullet.body.velocity.x = bullet.attributes.SPEED;
+      }
     }
   };
 
   this.collide = function(bullet, obj) {
-
-    // destroy bullet
-    bullet.kill();
-
     if (obj.attributes) {
       obj.attributes.touching = bullet.body.touching;
       obj.attributes.hurt(obj, bullet.attributes.damage);
     }
+    // destroy bullet
+    bullet.kill();
   };
 }
