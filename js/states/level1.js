@@ -37,6 +37,7 @@ Level1.prototype = {
 
   // items
   items: [],
+  sword: null,
 
   map: null,      // The game world map
   bg: null,       // The background image of the game
@@ -82,6 +83,11 @@ Level1.prototype = {
     this.game.player = new Player();
 
     this.player.attributes = this.game.player;
+
+    this.sword = this.game.add.sprite(48, 752, 'sword');
+    this.sword.visible = false;
+    this.sword.attributes = new Sword();
+    this.game.sword = this.sword;
 
     // Prepare the bunny locations
     this.groundBunnyLocations[0] = {x: 515, y: 656};
@@ -129,6 +135,9 @@ Level1.prototype = {
 
     // Enable physics on the player and sword
     this.game.physics.enable(this.player, Phaser.Physics.ARCADE);
+    this.game.physics.enable(this.sword, Phaser.Physics.ARCADE);
+
+    this.sword.attributes.create(this.sword, this.game);
 
     // Creates the player
     this.player.attributes.create(this.player, this.game);
@@ -145,12 +154,6 @@ Level1.prototype = {
 
     // Items
     this.game.items = this.items;
-    
-    // Instructions to play
-    var text = "Move: Arrow Keys  |  Jump: Space  |  Attack: C  |  Shoot: X";
-    var style = { font: "20px Arial", fill: "#ffffff", align: "center" };
-    this.instructions = this.game.add.text(30, 375, text, style);
-    this.instructions.fixedToCamera = true;
     
     // Music
     this.game.sound.removeByKey('titleMusic');
@@ -205,6 +208,8 @@ Level1.prototype = {
   oldManQuest: function(obj) {
     var style = { font: "14px Arial", fill: "#000", align: "center" };
     var t = obj.game.add.text(obj.game.camera.x + 50, obj.game.camera.y + 150, obj.attributes.QUEST_LINE, style);
+    obj.game.time.events.add(Phaser.Timer.SECOND * 8, function(text){text.destroy();}, this, t);
+    obj.game.player.sword = obj.game.sword;
   },
 
   updateMiniBoss1Health: function() {
@@ -258,7 +263,9 @@ Level1.prototype = {
     if (this.player.attributes.alive && !this.player.attributes.won) {
       this.player.attributes.update(this.player, this.game);
     }
-    
+
+    // Update the sword
+    this.sword.attributes.update(this.sword, this.game, this.player);
 
     // Update healthbar
     var w = (this.player.attributes.health / this.player.attributes.MAX_HEALTH) * this.healthBar.startWidth;
@@ -305,6 +312,11 @@ Level1.prototype = {
         this.player.attributes.bullets[i].attributes.update(this.player.attributes.bullets[i], this.game);
       }
     }
+
+    // Collision of the sword with the enemies
+    this.game.physics.arcade.collide(this.sword, this.groundBunnies, this.sword.attributes.collide);
+    this.game.physics.arcade.collide(this.sword, this.bats1, this.sword.attributes.collide);
+    this.game.physics.arcade.collide(this.sword, this.miniBoss1, this.sword.attributes.collide);
 
     // Updates for the ground bunnies
     for (var i = 0; i < 10; i++) {

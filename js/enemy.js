@@ -19,7 +19,7 @@ function EvilGroundBunny() {
 	this.bounceTime = 0;		// The time to bounce
 
 	this.SPEED = 50;
-	this.health = 15;
+	this.health = 5;
 	this.damage = 3;
 	this.direction = 'left';
 	this.loc = 0;
@@ -281,7 +281,7 @@ function MiniBoss() {
 	this.alive = true;
 	this.SPEED = 50;
 	this.health = 50;
-	this.damage = 10;
+	this.damage = 7;
 	this.direction = 'right';
 	this.loc = 0;
 	this.prevLoc = 0;
