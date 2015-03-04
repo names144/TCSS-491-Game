@@ -324,7 +324,7 @@ Level1.prototype = {
   },
 
   render: function() {
-    this.game.debug.cameraInfo(this.game.camera, 32, 32);
-    this.game.debug.spriteCoords(this.player, 32, 300);
+    //this.game.debug.cameraInfo(this.game.camera, 32, 32);
+    //this.game.debug.spriteCoords(this.player, 32, 300);
   }
 };
