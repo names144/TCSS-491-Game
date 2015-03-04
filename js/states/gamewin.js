@@ -12,7 +12,6 @@ GameWin.prototype = {
     var style = { font: "65px Arial", fill: "#3FCC14", align: "center" };
     var t = this.game.add.text(this.game.camera.x + 165, this.game.camera.y + 100, text, style);
     this.game.time.events.add(Phaser.Timer.SECOND+2, this.callback, this);
-    console.log(this.game);
   },
 
   callback: function() {
@@ -25,6 +24,8 @@ GameWin.prototype = {
   },
 
   playAgain: function() {
+    this.game.state.remove('Level1');
+    this.game.state.add('Level1', Level1);
     this.game.state.start('Level1');
   }
 

@@ -26,6 +26,9 @@ Preload.prototype = {
     // Load the spritesheet for our player, indicating the location, size of sprites, and the number of images on the sheet
     this.game.load.spritesheet('player', 'images/bmario.png', 32, 32, 20);
 
+    // Load the sword
+    this.game.load.spritesheet('sword', 'images/sword.png', 32, 32, 3);
+
     // Load the bullet sprite sheet
     this.game.load.spritesheet('bullet', 'images/bullet_1.png', 32, 32, 4);
 

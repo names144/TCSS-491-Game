@@ -31,14 +31,15 @@ function Player() {
 	this.alive = true;			// True if the player is alive
 	this.wasAttacked = false;
 	this.isAttacking = false;
-	this.meleeDamage = 7;
 	this.gainedHealth = false;
 
 	this.lastShoot = 0;
+	this.lastHitTime = 0;
 	this.bullets = [];
 	this.bulletDir = 'right';
 
 	this.items = [];
+	this.sword = null;
 
 	this.won = false;
 
@@ -200,10 +201,21 @@ function Player() {
 
 		// Check for melee
 		if (this.meleeButton.isDown) {
-			player.animations.play('melee');
-			this.isAttacking = true;
-			this.soundFX.sword.play();
+			if (this.meleeButton.downDuration(300)) {
+				if (this.sword) {
+					this.sword.visible = true;
+					this.isAttacking = true;
+					this.soundFX.sword.play();
+				}
+			} else {
+				if (this.sword) {
+					this.sword.visible = false
+				}
+			}
 		} else {
+			if (this.sword) {
+				this.sword.visible = false
+			}
 			this.isAttacking = false;
 		}
 
@@ -237,17 +249,17 @@ function Player() {
 			player.attributes.canBounce = true;
 		}
 
-		if ((obj.attributes instanceof EvilGroundBunny) && player.game.physics.arcade.distanceBetween(player, obj) < 30) {
-			player.attributes.hurt(obj.attributes.damage);
-		} else {
-			player.attributes.hurt(obj.attributes.damage);
+		// make sure we don't get spammed with hits on collision
+		if ((obj.game.time.now - player.attributes.lastHitTime) > 200) {
+			if ((obj.attributes instanceof EvilGroundBunny) && player.game.physics.arcade.distanceBetween(player, obj) < 30) {
+				player.attributes.hurt(obj.attributes.damage);
+				player.attributes.lastHitTime = obj.game.time.now;
+			} else {
+				player.attributes.hurt(obj.attributes.damage);
+				player.attributes.lastHitTime = obj.game.time.now;
+			}
 		}
 		
-		
-
-		if (player.attributes.isAttacking) {
-			obj.attributes.hurt(obj, player.attributes.meleeDamage);
-		}
 		
 		player.attributes.wasAttacked = true;
 
@@ -271,15 +283,17 @@ function Player() {
 	};
 
 	this.hurt = function(damage) {
-
 		this.health -= damage;
-
 		if (this.health <= 0) {
 			this.alive = false;
 		}
 	};
 
 	this.addItem = function(item) {
+		if (item.attributes && item.attributes.name === 'sword') {
+			this.sword = item;
+			return;
+		}
 		if (item.attributes.name === 'apple') {
 			if (this.health < 100) {
 				this.health += item.attributes.health;
