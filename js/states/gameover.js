@@ -1,9 +1,7 @@
 /*
 * Game Over
 */
-var GameOver = function(game) {
-  console.log('Game Over');
-};
+var GameOver = function(game) {};
 
 GameOver.prototype = {
 
