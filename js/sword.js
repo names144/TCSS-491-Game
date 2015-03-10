@@ -32,7 +32,7 @@ function Sword() {
       sword.body.enable = true;
       if (!player.attributes.playerFacingLeft) {
         // put sword where player is
-        sword.position.x = player.position.x + 20;
+        sword.position.x = player.position.x + 15;
         sword.position.y = player.position.y + 5;
         // Swing right
         if (this.direction === 'left') {
@@ -42,7 +42,7 @@ function Sword() {
         sword.animations.play('swing');
       } else {
         // put sword where player is
-        sword.position.x = player.position.x - 20;
+        sword.position.x = player.position.x - 15;
         sword.position.y = player.position.y + 5;
         // Swing left
         if (this.direction === 'right') {
