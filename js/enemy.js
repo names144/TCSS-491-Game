@@ -1,9 +1,7 @@
 /*
 * Holds all the info for the enemies.
 */
-
-
-// The evil ground bunny
+// The evil ground enemy
 function GroundEnemy() {
 	
 	this.MAX_IDLE = 1000;
@@ -30,8 +28,6 @@ function GroundEnemy() {
 	this.playerLocY = 0;
 
 	this.soundFX = {hurt:null, dead:null};
-
-
 
 	// Methods
 	this.create = function(enemy, game, type) {
@@ -75,7 +71,6 @@ function GroundEnemy() {
 
 	this.update = function(enemy, game, player) {
 		
-
 		// Attack if player is near
 		var posX = player.position.x - enemy.position.x;
 		var posY = player.position.y - enemy.position.y;
@@ -166,7 +161,6 @@ function GroundEnemy() {
 					enemy.idleTime = game.time.now;
 				} 
 			}
-
     }
 	};
 
@@ -379,12 +373,10 @@ function Bat() {
 			enemy.attributes.bounceTime = enemy.game.time.now;
 		}
 	}
-
 };
 
-
 /*
-*	Mini Boss
+*	Mini Boss 1
 */
 function MiniBoss() {
 
@@ -507,7 +499,6 @@ function MiniBoss() {
 		if (miniBoss.attributes.direction === 'left') {
 			miniBoss.position.y = 739;
 		}
-		
 	};
 
 	this.hurt = function(miniBoss, damage) {
@@ -528,16 +519,13 @@ function MiniBoss() {
 	}
 };
 
-
 /*
-*	Mini Boss
+*	Mini Boss 2
 */
 function MiniBoss2() {
 
 	this.MAX_IDLE = 1000;
 	this.MAX_HEALTH = 75;
-	this.ATTACK_RANGE_X = 200;
-	this.ATTACK_RANGE_Y = 100;
 	this.MAX_SHOTS = 3;
 
 	this.FIRE_RATE = 1500;
@@ -551,18 +539,11 @@ function MiniBoss2() {
 	this.hasShot = false;
 	this.canAttack = true;
 
-
 	this.alive = true;
-	this.SPEED = 50;
 	this.health = 75;
 	this.damage = 7;
 	this.direction = 'left';
-	this.loc = 0;
-	this.prevLoc = 0;
-	this.idleTime = 0;
 	this.isAttacking = false;
-	this.playerLocX = 0;
-	this.playerLocY = 0;
 
 	this.numShots = 0;
 
@@ -643,8 +624,6 @@ function MiniBoss2() {
 					miniBoss.attributes.bullets.push(bullet);
 					this.lastShoot = game.time.now;
 					miniBoss.attributes.soundFX.gun.play();
-
-
 					miniBoss.attributes.lastShot = game.time.now;
 					miniBoss.attributes.numShots++;
 				} else if (miniBoss.attributes.numShots === miniBoss.attributes.MAX_SHOTS) {
@@ -673,8 +652,6 @@ function MiniBoss2() {
 				miniBoss.attributes.tween.start();
 				miniBoss.attributes.hasShot = false;
 				miniBoss.attributes.tween.onComplete.addOnce(function(){miniBoss.attributes.canAttack = true;}, this);
-			} else {
-				
 			}
 		} 
 	};
@@ -684,7 +661,6 @@ function MiniBoss2() {
 		miniBoss.attributes.health -= damage;
 		miniBoss.attributes.soundFX.hurt.play();
 		if (miniBoss.attributes.health <= 0) {
-			
     	miniBoss.kill();
 		}
 	};
@@ -756,7 +732,7 @@ function Boss() {
 			// do a roll
 			// tween to center while rolling
 			boss.animations.play('dive');
-			boss.attributes.tween = game.add.tween(boss).to( { x: player.position.x, y: player.position.y}, 1000, Phaser.Easing.Linear.None, false, 0, 0, false);
+			boss.attributes.tween = game.add.tween(boss).to( { x: player.position.x, y: 1808}, 1000, Phaser.Easing.Linear.None, false, 0, 0, false);
 			
 			// make sure to face correct direction
 			if (boss.position.x > player.position.x) {

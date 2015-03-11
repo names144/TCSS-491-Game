@@ -57,11 +57,7 @@ function Player() {
 
 	this.soundFX = {sword:null,gun:null,jump:null};
 
-
 	// Methods of the player
-	// Create the player
-	// player = Phaser Sprite for the player
-	// game = the Phaser game instance
 	this.create = function(player, game, playerStats) {
 
 		// Sets the anchor for the sprite. Easier to handle axis flips, etc.
@@ -82,7 +78,6 @@ function Player() {
 		player.animations.play('idle');
 
 		this.hasArmour = playerStats.hasArmour;
-
 		this.hasKey = playerStats.hasKey;
 		this.hasGun_1 = playerStats.hasGun_1;
 		this.hasGun_2 = playerStats.hasGun_2;
@@ -100,8 +95,6 @@ function Player() {
 	};
 
 	// Updates physics based on actions
-	// player = Phaser Sprite for the player
-	// game = the Phaser game instance
 	this.update = function(player, game) {
 
 		if (!this.paused) {

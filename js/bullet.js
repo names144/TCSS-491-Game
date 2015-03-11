@@ -158,8 +158,6 @@ function Rocket() {
 * Boss Bomb
 */ 
 function Bomb() {
-  this.SPEED = 300;
-
   this.alive = false;
   this.damage = 15;
 

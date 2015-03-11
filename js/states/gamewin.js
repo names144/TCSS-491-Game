@@ -28,5 +28,4 @@ GameWin.prototype = {
     this.game.state.add('Level1', Level1);
     this.game.state.start('Level1');
   }
-
 };

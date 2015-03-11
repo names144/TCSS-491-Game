@@ -15,8 +15,6 @@ function OldMan() {
 
   this.CASTLE_SPEECH_1 = "I hope you are alright lad!\nThat was a dangerous battle!\nHurry and get to the princess!\nUse your double jump to climb out\nthe window towards the upper right!";
 
-  this.currentText = null;
-
   this.create = function(oldMan, game) {
     // Sets the size of the enemy physics body.
     oldMan.body.setSize(24, 43, 0, 0);
