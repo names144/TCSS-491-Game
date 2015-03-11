@@ -6,10 +6,6 @@ var Level3 = function(game) {};
 
 Level3.prototype = {
 
-  // Constants and Variables
-  GRAVITY: 500,
-  CAMERA_OFFSET_Y: 80,
-
   gameEnd: false,
   isBossReady: false,
   inDialog: false,
@@ -50,7 +46,6 @@ Level3.prototype = {
   bg: null,       // The background image of the game
   layer: null,    // The layer that holds the tilemap
 
-  instructions: null,
   bgMusic: null,
 
   create: function() {
@@ -59,7 +54,7 @@ Level3.prototype = {
     this.game.physics.startSystem(Phaser.Physics.ARCADE);
 
     // Sets the gravity for the physics engine.
-    this.game.physics.arcade.gravity.y = this.GRAVITY;
+    this.game.physics.arcade.gravity.y = GRAVITY;
 
     // Color the background
     var clouds = this.game.add.tileSprite(this.game.camera.x, this.game.camera.y, 600, 800, 'nightClouds');
@@ -346,7 +341,7 @@ Level3.prototype = {
 
     if (this.player.position.x > 2250 && this.player.position.y <= 1850) {
       this.game.camera.reset();
-      this.game.camera.focusOnXY(this.player.position.x, this.player.position.y - this.CAMERA_OFFSET_Y);
+      this.game.camera.focusOnXY(this.player.position.x, this.player.position.y - CAMERA_OFFSET_Y);
     }
 
     if (this.player.position.x > 2650 && this.player.position.y <= 1850 && !this.inDialog) {

@@ -6,9 +6,6 @@ var Level1 = function(game) {};
 Level1.prototype = {
 
   // Constants and Variables
-  GRAVITY: 500,
-  CAMERA_OFFSET_Y: 80,
-
   gameEnd: false,
   paused: false,
   canEnterCastle: false,
@@ -48,10 +45,8 @@ Level1.prototype = {
   noButton: null,
 
   map: null,      // The game world map
-  bg: null,       // The background image of the game
   layer: null,    // The layer that holds the tilemap
 
-  instructions: null,
   bgMusic: null,
 
   create: function() {
@@ -60,7 +55,7 @@ Level1.prototype = {
     this.game.physics.startSystem(Phaser.Physics.ARCADE);
 
     // Sets the gravity for the physics engine.
-    this.game.physics.arcade.gravity.y = this.GRAVITY;
+    this.game.physics.arcade.gravity.y = GRAVITY;
 
     var clouds = this.game.add.tileSprite(this.game.camera.x, this.game.camera.y, 600, 800, 'clouds');
     clouds.autoScroll(-5, 0);
@@ -80,26 +75,6 @@ Level1.prototype = {
 
     // Resizes the world for the layer
     this.layer.resizeWorld();
-
-    // Create the player and position in the world with given name 48
-    this.player = this.game.add.sprite(48, 752, 'player');
-
-    var playerStats = {
-      hasGun_1: false,
-      hasGun_2: false,
-      hasKey: false,
-      hasArmour: false,
-      hasDoubleJump: false
-    };
-
-    this.game.player = new Player();
-
-    this.player.attributes = this.game.player;
-
-    this.sword = this.game.add.sprite(48, 752, 'sword');
-    this.sword.visible = false;
-    this.sword.attributes = new Sword();
-    this.game.sword = this.sword.attributes;
 
     // Prepare the bunny locations
     this.groundBunnyLocations[0] = {x: 515, y: 656};
@@ -145,18 +120,6 @@ Level1.prototype = {
 
     this.miniBoss1.attributes.create(this.miniBoss1, this.game);
 
-    // Enable physics on the player and sword
-    this.game.physics.enable(this.player, Phaser.Physics.ARCADE);
-    this.game.physics.enable(this.sword, Phaser.Physics.ARCADE);
-
-    this.sword.attributes.create(this.sword, this.game);
-
-    // Creates the player
-    this.player.attributes.create(this.player, this.game, playerStats);
-
-    // Set the camera to follow the player
-    this.game.camera.follow(this.player);
-
     // Set up npcs
     this.oldMan = this.game.add.sprite(88, 725, 'oldMan');
 
@@ -170,6 +133,38 @@ Level1.prototype = {
     this.game.physics.enable(this.dude, Phaser.Physics.ARCADE);
     this.dude.attributes = new Dude();
     this.dude.attributes.create(this.dude, this.game);
+
+    // Create the player and position in the world with given name 48
+    this.player = this.game.add.sprite(48, 752, 'player');
+
+    var playerStats = {
+      hasGun_1: false,
+      hasGun_2: false,
+      hasKey: false,
+      hasArmour: false,
+      hasDoubleJump: false
+    };
+
+    this.game.player = new Player();
+
+    this.player.attributes = this.game.player;
+
+    this.sword = this.game.add.sprite(48, 752, 'sword');
+    this.sword.visible = false;
+    this.sword.attributes = new Sword();
+    this.game.sword = this.sword.attributes;
+
+    // Enable physics on the player and sword
+    this.game.physics.enable(this.player, Phaser.Physics.ARCADE);
+    this.game.physics.enable(this.sword, Phaser.Physics.ARCADE);
+
+    this.sword.attributes.create(this.sword, this.game);
+
+    // Creates the player
+    this.player.attributes.create(this.player, this.game, playerStats);
+
+    // Set the camera to follow the player
+    this.game.camera.follow(this.player);
 
     // Items
     this.game.items = this.items;
@@ -190,7 +185,6 @@ Level1.prototype = {
     this.game.physics.enable(apple2, Phaser.Physics.ARCADE);
     apple1.attributes.create(apple2, this.game, 'apple');
     this.game.items.push(apple2);
-
 
     // The healthbar fixed to the camera
     this.healthBar = this.game.add.sprite(390, 32, 'healthBar');
@@ -219,7 +213,6 @@ Level1.prototype = {
     this.okButton = this.game.add.button(320, 610, "okBtn", this.ok, this);
 
     this.paused = true;
-
   },
 
   ok: function() {
@@ -233,17 +226,6 @@ Level1.prototype = {
   // Helper functions
   endGame: function() {
     this.gameEnd = true;
-  },
-
-  checkForWin: function() {
-    if (this.player.attributes.won) {
-      // we won
-      this.bgMusic.stop();
-      // Change state
-      this.game.sound.stopAll();
-      this.player.body = null;
-      this.game.time.events.add(Phaser.Timer.SECOND+2, function(){this.game.state.start('GameWin');}, this);     
-    }
   },
 
   checkForDead: function() {
@@ -413,6 +395,7 @@ Level1.prototype = {
 
   update: function() {
 
+    // Check all collisions with layer
     this.game.physics.arcade.collide(this.player, this.layer);
 
     this.game.physics.arcade.collide(this.oldMan, this.layer);
@@ -527,9 +510,6 @@ Level1.prototype = {
       this.miniBoss1.attributes.update(this.miniBoss1, this.game, this.player);
 
       if (!this.gameEnd) {
-        // Check if won the game
-        this.checkForWin();
-
         // Check if dead
         this.checkForDead();
       }

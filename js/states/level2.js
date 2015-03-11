@@ -5,10 +5,6 @@ var Level2 = function(game) {};
 
 Level2.prototype = {
 
-  // Constants and Variables
-  GRAVITY: 500,
-  CAMERA_OFFSET_Y: 80,
-
   gameEnd: false,
   paused: false,
   didChestDialog: false,
@@ -53,7 +49,6 @@ Level2.prototype = {
   bg: null,       // The background image of the game
   layer: null,    // The layer that holds the tilemap
 
-  instructions: null,
   dialogBox: null,
   okButton: null,
   noButton: null,
@@ -66,7 +61,7 @@ Level2.prototype = {
     this.game.physics.startSystem(Phaser.Physics.ARCADE);
 
     // Sets the gravity for the physics engine.
-    this.game.physics.arcade.gravity.y = this.GRAVITY;
+    this.game.physics.arcade.gravity.y = GRAVITY;
 
     // Color the background
     this.bg = this.game.add.tileSprite(this.game.camera.x, this.game.camera.y, 600, 800, 'castle_inside');
@@ -447,7 +442,7 @@ Level2.prototype = {
 
     if (this.player.position.x > 2800 && this.player.position.y <= 720) {
       this.game.camera.reset();
-      this.game.camera.focusOnXY(this.player.position.x, this.player.position.y - this.CAMERA_OFFSET_Y);
+      this.game.camera.focusOnXY(this.player.position.x, this.player.position.y - CAMERA_OFFSET_Y);
     }
 
     if (this.isInitialLoad) {
